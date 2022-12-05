@@ -1,4 +1,4 @@
-package com.example.demo.domain.paymentType;
+package com.example.demo.domain.lesson;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,11 +12,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "payment_type")
+@Table(name = "lesson")
 @Entity
-public class PaymentType {
+public class Lesson {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String name;
+  private String title;
+  private Long price;
 }
