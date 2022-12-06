@@ -35,4 +35,10 @@ public class PaymentApiController {
     return iamportClient.paymentByImpUid(imp_uid);
   }
 
+  // @PostMapping("/users/getToken")
+  // public ResponseEntity<?> getImpToken(@RequestBody PaymentReqDto
+  // paymentReqDto) {
+  // return new ResponseEntity<>(null, null);
+  // }
+
 }
