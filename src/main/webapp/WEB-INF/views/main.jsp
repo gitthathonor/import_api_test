@@ -19,43 +19,73 @@ pageEncoding="UTF-8"%>
         ></script>
     </head>
     <body>
-        <button onclick="requestPay()">결제하기</button>
+        <input type="text" id="totalCount" value="3" />
+        <button onclick="requestPay(totalCount.value)">결제하기</button>
 
         <script>
             var IMP = window.IMP; // 생략 가능
             IMP.init("imp85183768"); // 예: imp00000000
 
-            function requestPay() {
+            function requestPay(totalCount) {
+                console.log(totalCount);
                 // IMP.request_pay(param, callback) 결제창 호출
                 IMP.request_pay(
                     {
                         // param
                         pg: "html5_inicis",
                         pay_method: "card",
-                        merchant_uid: "ORD20180131-135",
-                        name: "결제정보 저장 전 마지막 테스트",
-                        amount: 100,
+                        merchant_uid: "ORD555555",
+                        name: "DB에 저장하는 테스트",
+                        amount: 100 * totalCount,
                         buyer_email: "test@gmail.com",
                         buyer_name: "홍길동",
-                        buyer_tel: "010-3333-7777",
+                        buyer_tel: "010-3333-5555",
                         buyer_addr: "서울특별시 강남구",
                         buyer_postcode: "12345",
                     },
                     function (rsp) {
+                        console.log(rsp.imp_uid);
+                        // 결제 검증 코드
+                        $.ajax({
+                            type: "POST",
+                            url: "/verifyIamport/" + rsp.imp_uid,
+                        }).done(function (result) {
+                            console.log(result);
+                            if (rsp.paid_amount === result.response.amount) {
+                                console.log(result.response.amount);
+                                console.log(result.response.paidAt);
+                                alert("결제에 성공했습니다.");
+                                console.log(rsp.imp_uid);
+                                console.log(rsp.merchant_uid);
+                                console.log(rsp.paid_amount);
+                                console.log(rsp.pay_method);
+                                console.log(rsp.paid_at);
+
+                                let data = {
+                                    finalPrice: rsp.paid_amount,
+                                    totalCount: totalCount,
+                                    createdAt: result.response.paidAt,
+                                };
+
+                                $.ajax("/api/payment", {
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: JSON.stringify(data),
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                }).done((response) => {
+                                    alert(response.msg);
+                                    console.log(response.data);
+                                });
+                            } else {
+                                alert(
+                                    "결제에 실패하였습니다. 에러 내용: " +
+                                        rsp.error_msg
+                                );
+                            }
+                        });
                         // callback
-                        if (rsp.success) {
-                            alert("결제에 성공했습니다.");
-                            console.log(rsp.imp_uid);
-                            console.log(rsp.merchant_uid);
-                            console.log(rsp.paid_amount);
-                            console.log(rsp.pay_method);
-                            console.log(rsp.paid_at);
-                        } else {
-                            alert(
-                                "결제에 실패하였습니다. 에러 내용: " +
-                                    rsp.error_msg
-                            );
-                        }
                     }
                 );
             }
