@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.domain.payment.PaymentRepository;
+import com.example.demo.dto.PaymentReqDto.PaymentCancelReqDto;
 import com.example.demo.dto.PaymentReqDto.PaymentSaveReqDto;
 import com.example.demo.dto.PaymentRespDto.PaymentSaveRespDto;
 import com.example.demo.dto.ResponseDto;
@@ -43,6 +44,11 @@ public class PaymentApiController {
     com.example.demo.domain.payment.Payment payment = paymentRepository.save(paymentSaveReqDto.toEntity());
     PaymentSaveRespDto paymentSaveRespDto = new PaymentSaveRespDto(payment);
     return new ResponseDto<>("결제정보 입력 성공", paymentSaveRespDto);
+  }
+
+  @PostMapping("/payments/cancel")
+  public ResponseDto<?> cancelPayments(@RequestBody PaymentCancelReqDto paymentCancelReqDto) {
+    return new ResponseDto<>("결제취소 성공", null);
   }
 
 }

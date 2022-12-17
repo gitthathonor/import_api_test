@@ -1,6 +1,5 @@
 package com.example.demo.domain.payment;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -24,6 +23,7 @@ public class Payment {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private String impId; // 아임포트 고유 결제 ID -> 결제 취소 시에 사용할 예정
   @Column(nullable = true)
   private Long totalCount;
   @Column(nullable = true)
@@ -31,8 +31,9 @@ public class Payment {
   private Timestamp createdAt;
 
   @Builder
-  public Payment(Long id, Long totalCount, Long finalPrice, Timestamp createdAt) {
+  public Payment(Long id, String impId, Long totalCount, Long finalPrice, Timestamp createdAt) {
     this.id = id;
+    this.impId = impId;
     this.totalCount = totalCount;
     this.finalPrice = finalPrice;
     this.createdAt = createdAt;

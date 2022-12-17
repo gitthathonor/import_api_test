@@ -1,26 +1,31 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html lang="en">
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <!DOCTYPE html>
+    <html lang="en">
+
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
+        <title>결제 페이지</title>
         <!-- jQuery -->
-        <script
-            type="text/javascript"
-            src="https://code.jquery.com/jquery-1.12.4.min.js"
-        ></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
         <!-- iamport.payment.js -->
-        <script
-            type="text/javascript"
-            src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"
-        ></script>
+        <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
     </head>
+
     <body>
         <input type="text" id="totalCount" value="3" />
         <button onclick="requestPay(totalCount.value)">결제하기</button>
+
+
+
+        <!-- <form action="/payment/cancel" method="POST">
+            <input id="imp_id" type="text">
+            <button type="submit">취소하기</button>
+        </form> -->
+        <h2 id="imp_uid"></h2>
+        <button onclick="cancelPayment()">취소하기</button>
+
 
         <script>
             var IMP = window.IMP; // 생략 가능
@@ -34,7 +39,7 @@ pageEncoding="UTF-8"%>
                         // param
                         pg: "html5_inicis",
                         pay_method: "card",
-                        merchant_uid: "ORD555555",
+                        merchant_uid: "ORD5556",
                         name: "DB에 저장하는 테스트",
                         amount: 100 * totalCount,
                         buyer_email: "test@gmail.com",
@@ -62,6 +67,7 @@ pageEncoding="UTF-8"%>
                                 console.log(rsp.paid_at);
 
                                 let data = {
+                                    impId: rsp.imp_uid,
                                     finalPrice: rsp.paid_amount,
                                     totalCount: totalCount,
                                     createdAt: result.response.paidAt,
@@ -76,12 +82,14 @@ pageEncoding="UTF-8"%>
                                     },
                                 }).done((response) => {
                                     alert(response.msg);
-                                    console.log(response.data);
+                                    $('#imp_uid').html(response.data.impId);
+                                    //$('#imp_id').attr('value', response.data.impId);
+
                                 });
                             } else {
                                 alert(
                                     "결제에 실패하였습니다. 에러 내용: " +
-                                        rsp.error_msg
+                                    rsp.error_msg
                                 );
                             }
                         });
@@ -89,6 +97,34 @@ pageEncoding="UTF-8"%>
                     }
                 );
             }
+
+
+            // 결제 취소 
+            function cancelPayment() {
+                let impId = $("#imp_uid").text();
+                console.log(impId);
+
+                let data = {
+                    imp_uid: impId
+                };
+
+                $.ajax("/payments/cancel", {
+                    type: "POST",
+                    dataType: "json",
+                    data: JSON.stringify(data),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }).done((rsp) => {
+                    console.log(rsp.msg);
+                });
+            }
+
+
+
+
+
         </script>
     </body>
-</html>
+
+    </html>
